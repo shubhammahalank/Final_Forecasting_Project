@@ -16,7 +16,7 @@ submission = pd.read_csv('sample_submission.csv')
 # Streamlit Credentials
 # from PIL import Image
 # img = Image.open("walmart_logo.png")
-st.image(img,width=700,use_column_width=True)
+# st.image(img,width=700,use_column_width=True)
 st.title("M5 Forecasting - Accuracy") # Title
 st.header("Forecasting of sales of products at Walmart")
 #st.subheader("")
