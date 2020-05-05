@@ -17,13 +17,14 @@ import statsmodels.api as sm
 # Importing Dataframes
 @st.cache
 def  loadfile():
-	calendar = pd.read_csv('calendar.csv')
-	sales = pd.read_csv('sales_train_validation.csv')
-	sell_prices = pd.read_csv('sell_prices.csv')
-	submission = pd.read_csv('sample_submission.csv')
-	return calendar, sales, sell_prices
+	sales_train_validation = wget.download("https://s3.us-east-2.amazonaws.com/data.forecasting/sample_submission.csv")
+	# calendar = pd.read_csv('calendar.csv')
+	sales = pd.read_csv('sales_train_validation')
+	# sell_prices = pd.read_csv('sell_prices.csv')
+	# submission = pd.read_csv('sample_submission.csv')
+	return sales
 
-calendar, sales, sell_prices = loadfile()
+sales = loadfile()
 
 # Streamlit Credentials
 from PIL import Image
