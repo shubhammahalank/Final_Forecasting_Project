@@ -18,15 +18,14 @@ import statsmodels.api as sm
 # Importing Dataframes
 @st.cache
 def  loadfile():
-	sales_train_validation = wget.download("https://s3.us-east-2.amazonaws.com/data.forecasting/sample_submission.csv")
 	# calendar = pd.read_csv('calendar.csv')
-	sales = pd.read_csv(sales_train_validation)
+	sales_dow = wget.download("https://s3.us-east-2.amazonaws.com/data.forecasting/sales_train_validation.csv")
+	sales = pd.read_csv(sales_dow)
 	# sell_prices = pd.read_csv('sell_prices.csv')
 	# submission = pd.read_csv('sample_submission.csv')
 	return sales
 
 sales = loadfile()
-
 # Streamlit Credentials
 from PIL import Image
 img = Image.open("walmart_logo.png")
@@ -439,34 +438,34 @@ if choice == "Evaluation":
 		error_arima = np.linalg.norm(predictions[:3] - val_dataset.values[:3])/len(predictions[0])
 
 
-		dates = ["2007-12-" + str(i) for i in range(1, 31)]
-		predictions = []
-		for row in tqdm.tqdm(train_dataset[train_dataset.columns[-30:]].values[:3]):
-			df_prophet = pd.DataFrame(np.transpose([dates, row]))
-			df_prophet.columns = ["ds", "y"]
-			model = Prophet(daily_seasonality=True)
-			model.fit(df_prophet)
-			future = model.make_future_dataframe(periods=30)
-			forecast = model.predict(future)["yhat"].loc[30:].values
-			predictions.append(forecast)
-		predictions = np.array(predictions).reshape((-1, 30))
-		error_prophet = np.linalg.norm(predictions[:3] - val_dataset.values[:3])/len(predictions[0])
+		# dates = ["2007-12-" + str(i) for i in range(1, 31)]
+		# predictions = []
+		# for row in tqdm.tqdm(train_dataset[train_dataset.columns[-30:]].values[:3]):
+		# 	df_prophet = pd.DataFrame(np.transpose([dates, row]))
+		# 	df_prophet.columns = ["ds", "y"]
+		# 	model = Prophet(daily_seasonality=True)
+		# 	model.fit(df_prophet)
+		# 	future = model.make_future_dataframe(periods=30)
+		# 	forecast = model.predict(future)["yhat"].loc[30:].values
+		# 	predictions.append(forecast)
+		# predictions = np.array(predictions).reshape((-1, 30))
+		# error_prophet = np.linalg.norm(predictions[:3] - val_dataset.values[:3])/len(predictions[0])
 
-		# days = range(1, 1913 + 1)
-		# time_series_columns = [f'd_{i}' for i in days]
-		# time_series_data = sales[time_series_columns]
-		# forecast = pd.DataFrame(time_series_data.iloc[:, -28:].mean(axis=1))
-		# forecast = pd.concat([forecast] * 28, axis=1)
-		# forecast.columns = [f'F{i}' for i in range(1, forecast.shape[1] + 1)]
-		# validation_ids = sales['id'].values
-		# evaluation_ids = [i.replace('validation', 'evaluation') for i in validation_ids]
-		# ids = np.concatenate([validation_ids, evaluation_ids])
-		# predictions = pd.DataFrame(ids, columns=['id'])
-		# forecast = pd.concat([forecast] * 2).reset_index(drop=True)
-		# predictions = pd.concat([predictions, forecast], axis=1)
-		# predictions.to_csv('submission.csv', index=False)
+		days = range(1, 1913 + 1)
+		time_series_columns = [f'd_{i}' for i in days]
+		time_series_data = sales[time_series_columns]
+		forecast = pd.DataFrame(time_series_data.iloc[:, -28:].mean(axis=1))
+		forecast = pd.concat([forecast] * 28, axis=1)
+		forecast.columns = [f'F{i}' for i in range(1, forecast.shape[1] + 1)]
+		validation_ids = sales['id'].values
+		evaluation_ids = [i.replace('validation', 'evaluation') for i in validation_ids]
+		ids = np.concatenate([validation_ids, evaluation_ids])
+		predictions = pd.DataFrame(ids, columns=['id'])
+		forecast = pd.concat([forecast] * 2).reset_index(drop=True)
+		predictions = pd.concat([predictions, forecast], axis=1)
+		predictions.to_csv('submission.csv', index=False)
 
-		error = [error_avg, error_arima]
+		error = [error_avg, error_arima, error_prophet]
 		names = ["Moving average", "ARIMA"]
 		df = pd.DataFrame(np.transpose([error, names]))
 		df.columns = ["RMSE Loss", "Model"]
